@@ -1,5 +1,6 @@
 # coding=utf-8
 from collections import defaultdict
+import string
 
 
 class CACMIndexer():
@@ -30,6 +31,31 @@ class CACMIndexer():
     #    'keywords': 'mots clés'
     # }
     documents = defaultdict(dict)
+
+    # L'Index qu'on va construire, dictionnaire de la forme
+    # 'id doc': {
+    #    'mot 1': occurence (int)
+    #    'mot 2': occurence (int)
+    # }
+    index = defaultdict(dict)
+
+    # la stop-liste
+    STOP_LIST_PATH = './dataset/common_words'
+    stop_list = []
+
+    def __init__(self):
+        self._separate_documents()
+        self._parse_documents()
+        self._build_stop_list()
+        self._build_index()
+
+    def _build_stop_list(self):
+        '''
+        Remplit la stop liste a a partir des common_words du dataset
+        '''
+        with open(self.STOP_LIST_PATH, 'r') as common_words:
+            for word in common_words:
+                self.stop_list.append(word.strip().lower())
 
     def _separate_documents(self):
         '''
@@ -81,3 +107,44 @@ class CACMIndexer():
                 processed_document[current_field] += line
 
         return processed_document
+
+    def _build_index(self):
+        '''
+        Construit notre index
+        '''
+        for _id, document in self.documents.items():
+            self.index[_id] = self._index_document(document)
+
+    def _index_document(self, document):
+        '''
+        Construit et retourne un index pour le documents donnés
+        '''
+        # L'index du document. On set la valeur par default d'un mot a 0
+        index = defaultdict(int)
+
+        # TRAITEMENTS PRELIMINAIRES:
+        # on recupere tout le texte du document, et on met tout en minuscule
+        text = '\n'.join([document['title'], document['summary'], document['summary']])
+        text = text.lower()
+
+        # TOKENISATION:
+        # TODO: tokenisation plus précise via NLTK http://www.nltk.org/howto/tokenize.html
+        # On remplace la ponctuation et les sauts de ligne par des espaces
+        # puis on recupere la liste de mots dans le texte
+        for punct in (string.punctuation):
+            text = text.replace(punct, ' ')
+        text = text.replace('\n', ' ')
+        words = [word for word in text.split(' ') if word]
+
+        # STOPLIST:
+        # on retire les mots qui sont dans la stoplist
+        words = [word for word in words if word not in self.stop_list]
+
+        # STEMMING (Non demandé)
+        # TODO: si j'ai le temps (facile a faire avec nltk => http://www.nltk.org/howto/stem.html)
+
+        # STATISTIQUE
+        for word in words:
+            index[word] += 1
+
+        return index
