@@ -65,6 +65,10 @@ class CACMIndexer():
         self._build_index()
         self._build_basic_reversed_index()
 
+    @property
+    def doc_ids(self):
+        return self.index.keys()
+
     def _build_stop_list(self):
         '''
         Remplit la stop liste a a partir des common_words du dataset
@@ -231,7 +235,7 @@ class CACMIndexer():
 
         # On calcule les facteurs de normalisation (poid maximal dans un document)
         normalize_factors = {}
-        for doc_id in self.index.keys():
+        for doc_id in self.doc_ids:
             weights = [reversed_index[word][doc_id] for word in self.index[doc_id].keys()]
             normalize_factors[doc_id] = max(weights)
 
@@ -248,7 +252,7 @@ class CACMIndexer():
 
         # On calcule les facteurs de normalisation (poid maximal dans un document)
         normalize_factors = {}
-        for doc_id in self.index.keys():
+        for doc_id in self.doc_ids:
             weights = [reversed_index[word][doc_id] for word in self.index[doc_id].keys()]
             normalize_factors[doc_id] = max(weights)
 
