@@ -17,7 +17,7 @@ class CACMIndexer():
             (avec le parametre normalized pour choisir entre tf-idf et tf-idf normalisée)
 
         - reversed_index_normalized_frequency qui retourne l'index inversé pour la frequence normalisée
-            (basée sur tf-idf normalisée)
+            (basée sur tf-idf)
     '''
 
     # L'emplacement de la collection
@@ -184,7 +184,7 @@ class CACMIndexer():
         tf = self.index[doc_id][term]
         if normalize:
             # On normalise en divisant la frequence par le nombre de mots significatifs dans le doc
-            tf = tf / self._document_size(doc_id)
+            tf = tf / float(self._document_size(doc_id))
 
         return tf
 
