@@ -14,11 +14,10 @@ class CACMIndexer():
 
     Les methodes importantes pour la recherche sont:
         - reversed_index_tf_idf qui retourne l'index inversé pour la ponderation tf-idf
-            (avec le parametre normalized pour choisir entre tf-idf et tf-idf normalisée)
-
-        - reversed_index_normalized_frequency qui retourne l'index inversé pour la frequence normalisée
-            (basée sur tf-idf)
-    '''
+        - reversed_index_tf_idf_log qui retourne l'index inversé pour la ponderation tf-idf logarithmique
+        - reversed_index_tf_idf_normalized qui retourne l'index inversé pour la ponderation tf-idf normalisée
+        - reversed_index_tf_idf_log_normalized qui retourne l'index inversé pour la ponderation tf-idf logarithmique normalisée
+'''
 
     # L'emplacement de la collection
     COLLECTION_PATH = './dataset/cacm.all'
@@ -177,22 +176,18 @@ class CACMIndexer():
         '''
         return sum(self.index[doc_id].values())
 
-    def _tf(self, term, doc_id, normalize):
+    def _tf(self, term, doc_id):
         '''
         Retourne la frequence normalisee du terme dans le document
         '''
         tf = self.index[doc_id][term]
-        if normalize:
-            # On normalise en divisant la frequence par le nombre de mots significatifs dans le doc
-            tf = tf / float(self._document_size(doc_id))
-
         return tf
 
-    def _log_tf(self, term, doc_id, normalize):
+    def _log_tf(self, term, doc_id):
         '''
         Retourne la frequence logarithmique du terme dans le document.
         '''
-        tf = self._tf(term, doc_id, normalize)
+        tf = self._tf(term, doc_id)
         if tf > 0:
             return 1 + log10(tf)
         else:
@@ -204,22 +199,60 @@ class CACMIndexer():
         '''
         return len(self.basic_reversed_index[word])
 
-    def reversed_index_tf_idf(self, normalize):
+    def reversed_index_tf_idf(self):
         '''
-        Construit et retourne un index inversé basé sur la ponderation tf-idf (normalisee si demandé)
+        Construit et retourne un index inversé basé sur la ponderation tf-idf
         '''
         nb_documents = len(self.documents)
-        index = defaultdict(dict)
+        reversed_index = defaultdict(dict)
         for word, documents in self.basic_reversed_index.items():
             idf = log10(nb_documents / self._dft(word))
             for doc_id in documents:
-                index[word][doc_id] = self._log_tf(word, doc_id, normalize) * idf
-        return index
+                reversed_index[word][doc_id] = self._tf(word, doc_id) * idf
+        return reversed_index
 
-    def reversed_index_normalized_frequency(self):
-        index = self.reversed_index_tf_idf(True)
-        for word, word_data in index.items():
-            normalize_factor = max(word_data.values())
+    def reversed_index_tf_idf_log(self):
+        '''
+        Construit et retourne un index inversé basé sur la ponderation tf-idf logarithmique
+        '''
+        nb_documents = len(self.documents)
+        reversed_index = defaultdict(dict)
+        for word, documents in self.basic_reversed_index.items():
+            idf = log10(nb_documents / self._dft(word))
+            for doc_id in documents:
+                reversed_index[word][doc_id] = self._log_tf(word, doc_id) * idf
+        return reversed_index
+
+    def reversed_index_tf_idf_normalized(self):
+        '''
+        Construit et retourne un index inversé basé sur la ponderation tf-idf normalisée
+        '''
+        reversed_index = self.reversed_index_tf_idf()
+
+        # On calcule les facteurs de normalisation (poid maximal dans un document)
+        normalize_factors = {}
+        for doc_id in self.index.keys():
+            weights = [reversed_index[word][doc_id] for word in self.index[doc_id].keys()]
+            normalize_factors[doc_id] = max(weights)
+
+        for word, word_data in reversed_index.items():
             for doc_id, frequence in word_data.items():
-                index[word][doc_id] = frequence / normalize_factor
-        return index
+                reversed_index[word][doc_id] = frequence / normalize_factors[doc_id]
+        return reversed_index
+
+    def reversed_index_tf_idf_log_normalized(self):
+        '''
+        Construit et retourne un index inversé basé sur la ponderation tf-idf logarithmique normalisée
+        '''
+        reversed_index = self.reversed_index_tf_idf_log()
+
+        # On calcule les facteurs de normalisation (poid maximal dans un document)
+        normalize_factors = {}
+        for doc_id in self.index.keys():
+            weights = [reversed_index[word][doc_id] for word in self.index[doc_id].keys()]
+            normalize_factors[doc_id] = max(weights)
+
+        for word, word_data in reversed_index.items():
+            for doc_id, frequence in word_data.items():
+                reversed_index[word][doc_id] = frequence / normalize_factors[doc_id]
+        return reversed_index
