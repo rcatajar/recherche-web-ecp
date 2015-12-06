@@ -1,7 +1,7 @@
 # coding=utf-8
 
 
-class Indexer():
+class CACMIndexer():
     '''
     Indexe une collection de documents
     '''
@@ -17,4 +17,3 @@ class Indexer():
     MARKER_AUTHOR = '.A'
     MARKER_COLLECTION_DATE = '.N'
     MARKER_REF = '.X'
-
