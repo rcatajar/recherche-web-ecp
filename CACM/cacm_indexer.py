@@ -32,12 +32,20 @@ class CACMIndexer():
     # }
     documents = defaultdict(dict)
 
-    # L'Index qu'on va construire, dictionnaire de la forme
+    # L'Index qu'on va construire, dictionnaire de la forme:
     # 'id doc': {
     #    'mot 1': occurence (int)
     #    'mot 2': occurence (int)
     # }
     index = defaultdict(dict)
+
+    # Un index inversé basique, qui nous sera utile pour construire les indexs inversés avec pondération.
+    # Dictionnaire de la forme:
+    # 'mot': {
+    #    'occurences': 42,  # nbre d'occurences du mot dans toute la collection
+    #    'documents': [liste des docs qui contiennent ce mot]
+    # }
+    basic_reversed_index = defaultdict(lambda: {'occurences': 0, 'documents': []})
 
     # la stop-liste
     STOP_LIST_PATH = './dataset/common_words'
@@ -48,6 +56,7 @@ class CACMIndexer():
         self._parse_documents()
         self._build_stop_list()
         self._build_index()
+        self._build_basic_reversed_index()
 
     def _build_stop_list(self):
         '''
@@ -148,3 +157,9 @@ class CACMIndexer():
             index[word] += 1
 
         return index
+
+    def _build_basic_reversed_index(self):
+        for _id, index_doc in self.index.items():
+            for word, occurences in index_doc.items():
+                self.basic_reversed_index[word]['occurences'] += occurences
+                self.basic_reversed_index[word]['documents'].append(_id)
