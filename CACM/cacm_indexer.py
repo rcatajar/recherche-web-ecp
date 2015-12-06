@@ -1,11 +1,23 @@
 # coding=utf-8
 from collections import defaultdict
 import string
+from math import log10
 
 
 class CACMIndexer():
     '''
-    Indexe une collection de documents
+    Indexe une collection de documents et permet la creation de differents index inversés
+
+    La plupart des methodes (prefixé par _) sont des methodes internes a la classe,
+    traitant l'import de la collection et la creation de l'index basique
+
+
+    Les methodes importantes pour la recherche sont:
+        - reversed_index_tf_idf qui retourne l'index inversé pour la ponderation tf-idf
+            (avec le parametre normalized pour choisir entre tf-idf et tf-idf normalisée)
+
+        - reversed_index_normalized_frequency qui retourne l'index inversé pour la frequence normalisée
+            (basée sur tf-idf normalisée)
     '''
 
     # L'emplacement de la collection
@@ -40,12 +52,8 @@ class CACMIndexer():
     index = defaultdict(dict)
 
     # Un index inversé basique, qui nous sera utile pour construire les indexs inversés avec pondération.
-    # Dictionnaire de la forme:
-    # 'mot': {
-    #    'occurences': 42,  # nbre d'occurences du mot dans toute la collection
-    #    'documents': [liste des docs qui contiennent ce mot]
-    # }
-    basic_reversed_index = defaultdict(lambda: {'occurences': 0, 'documents': []})
+    # Dictionnaire de la forme: {'mot': [liste des docs qui contiennent ce mot]}
+    basic_reversed_index = defaultdict(list)
 
     # la stop-liste
     STOP_LIST_PATH = './dataset/common_words'
@@ -160,6 +168,58 @@ class CACMIndexer():
 
     def _build_basic_reversed_index(self):
         for _id, index_doc in self.index.items():
-            for word, occurences in index_doc.items():
-                self.basic_reversed_index[word]['occurences'] += occurences
-                self.basic_reversed_index[word]['documents'].append(_id)
+            for word in index_doc.keys():
+                self.basic_reversed_index[word].append(_id)
+
+    def _document_size(self, doc_id):
+        '''
+        Retourne la taille (nb de mots) d'un document en ne prenant en compte que les mots significatifs
+        '''
+        return sum(self.index[doc_id].values())
+
+    def _tf(self, term, doc_id, normalize):
+        '''
+        Retourne la frequence normalisee du terme dans le document
+        '''
+        tf = self.index[doc_id][term]
+        if normalize:
+            # On normalise en divisant la frequence par le nombre de mots significatifs dans le doc
+            tf = tf / self._document_size(doc_id)
+
+        return tf
+
+    def _log_tf(self, term, doc_id, normalize):
+        '''
+        Retourne la frequence logarithmique du terme dans le document.
+        '''
+        tf = self._tf(term, doc_id, normalize)
+        if tf > 0:
+            return 1 + log10(tf)
+        else:
+            return 0
+
+    def _dft(self, word):
+        '''
+        Retourne le nombre de documents contenant le mot donné.
+        '''
+        return len(self.basic_reversed_index[word])
+
+    def reversed_index_tf_idf(self, normalize):
+        '''
+        Construit et retourne un index inversé basé sur la ponderation tf-idf (normalisee si demandé)
+        '''
+        nb_documents = len(self.documents)
+        index = defaultdict(dict)
+        for word, documents in self.basic_reversed_index.items():
+            idf = log10(nb_documents / self._dft(word))
+            for doc_id in documents:
+                index[word][doc_id] = self._log_tf(word, doc_id, normalize) * idf
+        return index
+
+    def reversed_index_normalized_frequency(self):
+        index = self.reversed_index_tf_idf(True)
+        for word, word_data in index.items():
+            normalize_factor = max(word_data.values())
+            for doc_id, frequence in word_data.items():
+                index[word][doc_id] = frequence / normalize_factor
+        return index
