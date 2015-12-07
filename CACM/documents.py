@@ -40,7 +40,11 @@ class QueryDocument(Document):
     '''
 
     def __init__(self, query):
-        self.text = query
+        self.query = query
+
+    @property
+    def text(self):
+        return self.query
 
     @property
     def id(self):

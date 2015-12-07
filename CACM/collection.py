@@ -69,7 +69,7 @@ class CACMCollection(Collection):
         for _id, document in raw_documents.items():
             document = self._parse_document(document)
             document = CACMDocument(_id, document['title'], document['summary'], document['keywords'])
-            self._documents.append(document)
+            self._documents[_id] = document
 
     def _parse_document(self, document):
         '''

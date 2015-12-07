@@ -57,7 +57,7 @@ class Index(object):
         self.add_documents(documents)
 
     @property
-    def document_count(self):
+    def documents_count(self):
         '''
         Nombre de documents indexés
         '''
@@ -134,9 +134,9 @@ class Index(object):
         Retourne vecteur avec poids tf-idf pour le document id passé en arguments.
         Poids normalisés si arg `normalize` == True
         '''
-        tf_idf = {}
+        tf_idf = defaultdict(float)
         documents_count = self.documents_count
-        for word, count in self.document_index.items():
+        for word, count in self.document_index[doc_id].items():
             dft = self._dft(word)
             tf_idf[word] = count * log10(documents_count / dft)
 
@@ -144,7 +144,8 @@ class Index(object):
         if normalize:
             # On normalize en divisant par le plus grand poids dans le doc
             normalize_factor = max(tf_idf.values())
-            tf_idf = {word: weight / normalize_factor for word, weight in tf_idf.items()}
+            for word, weight in tf_idf.items():
+                tf_idf[word] = weight / normalize_factor
 
         return tf_idf
 
@@ -153,17 +154,18 @@ class Index(object):
         Retourne vecteur avec poids tf-idf logarithmique pour le document id passé en arguments.
         Poids normalisés si arg `normalize` == True
         '''
-        tf_idf_log = {}
+        tf_idf_log = defaultdict(float)
         documents_count = self.documents_count
-        for word, count in self.document_index.items():
-            dft = self._dft(word)
+        for word, count in self.document_index[doc_id].items():
+            dft = float(self._dft(word))
             tf_idf_log[word] = (1 + log10(count)) * log10(documents_count / dft)
 
         # Normalisation si demandé
         if normalize:
             # On normalize en divisant par le plus grand poids dans le doc
             normalize_factor = max(tf_idf_log.values())
-            tf_idf_log = {word: weight / normalize_factor for word, weight in tf_idf_log.items()}
+            for word, weight in tf_idf_log.items():
+                tf_idf_log[word] = weight / normalize_factor
 
         return tf_idf_log
 
