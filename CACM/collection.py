@@ -8,7 +8,7 @@ class Collection(object):
     '''
     Represente une collection de documents
     '''
-    documents = []
+    _documents = {}  # {id: Document}
 
 
 class CACMCollection(Collection):
@@ -31,6 +31,19 @@ class CACMCollection(Collection):
     def __init__(self):
         raw_documents = self._separate_documents()
         self._import_documents(raw_documents)
+
+    def get_document_by_id(self, doc_id):
+        '''
+        Renvoi le document avec l'id donné s'il existe (sinon None)
+        '''
+        return self._documents.get(doc_id, None)
+
+    @property
+    def documents(self):
+        '''
+        Liste des documents dans la collection
+        '''
+        return self._documents.values()
 
     def _separate_documents(self):
         '''
@@ -56,7 +69,7 @@ class CACMCollection(Collection):
         for _id, document in raw_documents.items():
             document = self._parse_document(document)
             document = CACMDocument(_id, document['title'], document['summary'], document['keywords'])
-            self.documents.append(document)
+            self._documents.append(document)
 
     def _parse_document(self, document):
         '''
