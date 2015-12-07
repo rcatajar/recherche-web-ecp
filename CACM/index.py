@@ -201,3 +201,12 @@ class Index(object):
             return self._tf_idf_log(doc_id, True, index)
         else:
             raise ValueError("Unsupported weight_type: %s" % weight_type)
+
+    def search_word(self, word):
+        '''
+        Retourne la liste des ids des documents contenant le mot passé en argument
+        '''
+        # Si le mot est dans les stop_words, on revoit tout les documents
+        if word in self.stop_words:
+            return self.documents_ids
+        return self.word_index[word].keys()
