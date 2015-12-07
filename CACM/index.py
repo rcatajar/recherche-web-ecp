@@ -16,17 +16,15 @@ class Index(object):
             -> ajoute une liste de documents a l'index
         - add_document(self, document)
             ->ajoute un document a l'index
-        - tf_idf(self, document_id, normalize)
-            -> retorune vecteur de poids tf-idf pour le document id demandé.
-               normalise si `normalize` == True
-        - tf_idf(self, document_id, normalize)
-            -> retorune vecteur de poids tf-idf logarithmique pour le document id demandé.
-               normalise si `normalize` == True
-
+        - get_document_vector(self, document_id, weight_type)
+            -> retourne vecteur de poids ({mot1: poids1, mot2: poids2, ...}) pour le document id demandé.
+               weight_type indique le type de poids a utiliser
+               ("tf_idf", "tf_idf_normalized", "tf_idf_log", "tf_idf_log_normalized")
     '''
 
     # L'utilisation de defaultdict permet de "forcer" la structure des dictionnaires d'index
     # Ce qui permettra d'eviter de devoir a chaque fois checker si les clés / valeurs existent
+    # Comme ca on aura toujours index[doc][mot] = 0 si la valeur n'a pas été set au lieu d'une KeyError
 
     # Index document -> mots
     # dictionnaire de la forme:
@@ -131,7 +129,7 @@ class Index(object):
         '''
         return len(self.word_index[word].keys())
 
-    def tf_idf(self, doc_id, normalize):
+    def _tf_idf(self, doc_id, normalize):
         '''
         Retourne vecteur avec poids tf-idf pour le document id passé en arguments.
         Poids normalisés si arg `normalize` == True
@@ -150,7 +148,7 @@ class Index(object):
 
         return tf_idf
 
-    def tf_idf_log(self, doc_id, normalize):
+    def _tf_idf_log(self, doc_id, normalize):
         '''
         Retourne vecteur avec poids tf-idf logarithmique pour le document id passé en arguments.
         Poids normalisés si arg `normalize` == True
@@ -168,3 +166,22 @@ class Index(object):
             tf_idf_log = {word: weight / normalize_factor for word, weight in tf_idf_log.items()}
 
         return tf_idf_log
+
+    def get_document_vector(self, doc_id, weight_type):
+        '''
+        Retourne vecteur de poids pour le document id demandé.
+        (vecteur de la forme {mot1: poids1, mot2: poids2, ...})
+
+        `weight_type` indique le type de poids a utiliser
+        Poids supportés: ["tf_idf", "tf_idf_normalized", "tf_idf_log", "tf_idf_log_normalized"]
+        '''
+        if weight_type == 'tf_idf':
+            return self._tf_idf(doc_id, False)
+        if weight_type == 'tf_idf_normalized':
+            return self._tf_idf(doc_id, True)
+        if weight_type == 'tf_idf_log':
+            return self._tf_idf_log(doc_id, False)
+        if weight_type == 'tf_idf_log_normalized':
+            return self._tf_idf_log(doc_id, True)
+        else:
+            raise ValueError("Unsupported weight_type: %s" % weight_type)
