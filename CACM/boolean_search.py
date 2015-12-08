@@ -50,7 +50,7 @@ class OrNode(Node):
     """
     def search(self):
         '''
-        Pour un OR, le resultat de la recherche est le resultat de ceux des enfants
+        Pour un OR, le resultat de la recherche est l'union de ceux des enfants
         '''
         return self.children[0].search() | self.children[1].search()
 
