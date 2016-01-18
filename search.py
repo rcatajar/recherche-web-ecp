@@ -2,6 +2,7 @@
 # coding=utf-8
 
 import time
+import sys
 
 from collection import CACMCollection
 from index import Index
@@ -25,6 +26,7 @@ def choose_collection():
         index = Index(collection.documents)
         collection_indexed = time.time()
         print("Collection CACM indéxée en %s secondes" % (collection_indexed - collection_imported))
+        print("Taille de l'index en mémoire: ~ %s Méga-octets" % (sys.getsizeof(index) / float(10**6)))
         return collection, index
     else:
         raise ValueError("Input invalide")

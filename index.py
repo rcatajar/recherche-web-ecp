@@ -1,4 +1,6 @@
 # coding=utf-8
+import inspect
+import sys
 from collections import defaultdict
 import string
 from math import log10
@@ -32,6 +34,16 @@ class Index(object):
         self._build_stop_words()
         self._initialize_indexs()
         self.add_documents(documents)
+
+    def __sizeof__(self):
+        '''
+        Retourne la taille en octet de l'objet
+        '''
+        size = 0
+        for (name, val) in inspect.getmembers(self):
+            size += sys.getsizeof(val)
+            size += sys.getsizeof(name)
+        return size
 
     def _initialize_indexs(self):
         '''
