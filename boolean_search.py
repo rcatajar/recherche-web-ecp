@@ -23,6 +23,7 @@ class Node:
     """
     Noeud de l'arbre
     """
+
     def __init__(self, *children):
         self.children = children
 
@@ -37,6 +38,7 @@ class AndNode(Node):
     """
     Noeud représentant un AND. Possède deux enfants
     """
+
     def search(self):
         '''
         Pour un AND, le resulat de la recherche est l'intersection de ceux des enfants
@@ -48,6 +50,7 @@ class OrNode(Node):
     """
     Noeud représentant un OR. Possède deux enfants
     """
+
     def search(self):
         '''
         Pour un OR, le resultat de la recherche est l'union de ceux des enfants
@@ -61,6 +64,7 @@ class NotNode(Node):
 
     Le noeud doit etre instancier avec un index
     """
+
     def __init__(self, child, index):
         self.children = (child, )
         self.index = index
@@ -78,6 +82,7 @@ class WordNode(Node):
 
     Le noeud doit être instancier avec un index et un mot
     """
+
     def __init__(self, index, word):
         self.index = index
         self.word = word
@@ -100,11 +105,9 @@ def _tokenize_query(query):
     tokens = re.split(r'\W', query)
 
     # On retire la ponctuation (sauf les paranthèses) et les éventuels espaces
-    tokens = [
-        token
-        for token in tokens
-        if token == ')' or token == '(' or token not in string.punctuation or token not in string.whitespace
-    ]
+    stop_characters = string.punctuation.replace('(', '').replace(')', '')
+    stop_characters += string.whitespace
+    tokens = [token for token in tokens if token not in stop_characters]
     return tokens
 
 
@@ -151,7 +154,8 @@ def build_query_tree(query, index):
     tokens = _add_missing_and(tokens)
 
     # On construit l'arbre.
-    # Algo basé sur Shunting-Yard par Dijkstra. L'implementation est une adaptation de
+    # Algo basé sur Shunting-Yard par Dijkstra.
+    # L'implementation est une adaptation de
     # https://msoulier.wordpress.com/2009/08/01/dijkstras-shunting-yard-algorithm-in-python
 
     # Stack avec les opérateurs en cours de traitements

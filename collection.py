@@ -36,6 +36,8 @@ class CACMCollection(Collection):
         '''
         Renvoi le document avec l'id donné s'il existe (sinon None)
         '''
+        # Au cas ou doc_id soit un int et nom un string comme dans self._documents
+        doc_id = str(doc_id)
         return self._documents.get(doc_id, None)
 
     @property

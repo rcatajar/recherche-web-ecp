@@ -146,7 +146,9 @@ class Index(object):
         for word, count in self.document_index[doc_id].items():
             # Float pour forcer une division "non entiere" dans le log de l'idf
             dft = index._dft(word)
-            tf_idf[word] = count * log10(documents_count / dft)
+            # "if dft else 0" pour éviter une division par 0.
+            # Si dft est nul (mot pas dans l'index de reference), on met le poids à 0
+            tf_idf[word] = count * log10(documents_count / dft) if dft else 0
 
         # Normalisation si demandé
         if normalize:
@@ -167,7 +169,9 @@ class Index(object):
         for word, count in self.document_index[doc_id].items():
             # Float pour forcer une division "non entiere" dans le log de l'idf
             dft = float(index._dft(word))
-            tf_idf_log[word] = (1 + log10(count)) * log10(documents_count / dft)
+            # "if dft else 0" pour éviter une division par 0.
+            # Si dft est nul (mot pas dans l'index de reference), on met le poids à 0
+            tf_idf_log[word] = (1 + log10(count)) * log10(documents_count / dft) if dft else 0
 
         # Normalisation si demandé
         if normalize:

@@ -11,14 +11,14 @@ from documents import QueryDocument
 SearchResult = namedtuple("SearchResult", ['doc_id', 'similarity'])
 
 
-def vectorial_search(querystring, answers_count, collection_index, weight_type):
+def vectorial_search(querystring, collection_index, weight_type):
     '''
     Recherche vectorielle de `querystring` dans `collection_index` en utilisant les poids
-    de type `weight_type`. Renvoie les `answers_count` meilleurs résultats
+    de type `weight_type`. Renvoie les résultats de similarité > 0 (ordonnées par similarité)
     '''
     search_results = []  # Resultat de la recherche
 
-    # On indexe la recherche et on crée son vecteurz
+    # On indexe la recherche et on crée son vecteur
     query_doc = QueryDocument(querystring)
     query_index = Index([query_doc])
     # On calcule le vecteur de la query par rappport a l'index de la collection
@@ -34,8 +34,8 @@ def vectorial_search(querystring, answers_count, collection_index, weight_type):
     # On trie nos resultats par ordre decroissant de similarité
     search_results = sorted(search_results, key=lambda result: -result.similarity)
 
-    # On revoie le nombre de resultats voulu
-    return search_results[:answers_count]
+    # On revoie les résultats qui ont une similarité > 0
+    return [result for result in search_results if result.similarity > 0]
 
 
 def cosinus_similarity(query_vector, doc_vector):

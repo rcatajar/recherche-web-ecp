@@ -25,6 +25,10 @@ class CACMDocument(Document):
         self.summary = summary
         self.keywords = keywords
 
+    # Pour avoir un joli "print" du document
+    def __str__(self):
+        return 'ID: %s  TITRE: %s' % (self.doc_id, self.title)
+
     @property
     def id(self):
         return int(self.doc_id)
