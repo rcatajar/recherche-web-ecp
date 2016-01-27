@@ -22,11 +22,19 @@ def choose_collection():
         start = time.time()
         collection = CACMCollection()
         collection_imported = time.time()
+        print("\n")
         print("Collection CACM importée en %s secondes" % (collection_imported - start))
         index = Index(collection.documents)
         collection_indexed = time.time()
         print("Collection CACM indéxée en %s secondes" % (collection_indexed - collection_imported))
         print("Taille de l'index en mémoire: ~ %s Méga-octets" % (sys.getsizeof(index) / float(10**6)))
+        print("\n")
+        print("En realite, ce script utilise plus de memoire car on garde egalement dans la RAM")
+        print("la collection entiere (~40 Mega-octets) pour pouvoir afficher le contenu des")
+        print("resultats de recherche a l'utilisateur (et non juste l'id des documents).")
+        print("Cependant, les fonctions de recherche utilisent exclusivement les indexes")
+        print("(cf methodes boolean_search et vectorial_search)")
+
         return collection, index
     else:
         raise ValueError("Input invalide")
