@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # coding=utf-8
 
+# Interface principale de recherche
+# Demande a l'utilisateur de choisir collection et modele de recherche
+# Et lui permet d'effectuer des recherches
+
+
 import time
 import sys
 
@@ -49,12 +54,15 @@ def choose_search_type():
     print('1 - Recherche vectorielle')
     print('2 - Recherche booléenne')
     print('3 - Recherche probabiliste (non implémenté pour le moment)')
+    print('0 - quitter')
     search_choice = input('Choisissez un type de recherche: ')
     print('\n')
     if search_choice == 1:
         return "vectorial"
     if search_choice == 2:
         return "boolean"
+    if search_choice == 0:
+        sys.exit(0)
     else:
         raise ValueError("Input invalide")
 
@@ -116,22 +124,26 @@ def print_results_boolean_search(search_results, query, collection):
         print("%s" % collection.get_document_by_id(doc_id))
 
 
-collection, index = choose_collection()
-search_type = choose_search_type()
+# Run uniquement si le script est appelé directement
+if __name__ == '__main__':
+    # Choix de collection
+    collection, index = choose_collection()
 
-if search_type == "vectorial":
-    weight = choose_weight_type()
-    query = choose_query()
-    start = time.time()
-    search_results = vectorial_search(query, index, weight)
-    end = time.time()
-    print("Temps d'exécution de la recherche: %s secondes" % (end - start))
-    print_results_vectorial_search(search_results, query, collection)
+    while True:  # la possibilite de quitter est dans le choix du type de recherche
+        search_type = choose_search_type()
+        if search_type == "vectorial":
+            weight = choose_weight_type()
+            query = choose_query()
+            start = time.time()
+            search_results = vectorial_search(query, index, weight)
+            end = time.time()
+            print("Temps d'exécution de la recherche: %s secondes" % (end - start))
+            print_results_vectorial_search(search_results, query, collection)
 
-if search_type == "boolean":
-    query = choose_query_bool()
-    start = time.time()
-    search_results = boolean_search(query, index)
-    end = time.time()
-    print("Temps d'exécution de la recherche: %s secondes" % (end - start))
-    print_results_boolean_search(search_results, query, collection)
+        if search_type == "boolean":
+            query = choose_query_bool()
+            start = time.time()
+            search_results = boolean_search(query, index)
+            end = time.time()
+            print("Temps d'exécution de la recherche: %s secondes" % (end - start))
+            print_results_boolean_search(search_results, query, collection)
