@@ -1,9 +1,0 @@
-\BOOKMARK [1][-]{section.1}{Installation et utilisation du moteur de recherche}{}% 1
-\BOOKMARK [1][-]{section.2}{Impl\351mentation et fonctionnement du moteur}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{Parsing de la collection CACM}{section.2}% 3
-\BOOKMARK [2][-]{subsection.2.2}{Indexation}{section.2}% 4
-\BOOKMARK [2][-]{subsection.2.3}{Recherche bool\351enne}{section.2}% 5
-\BOOKMARK [2][-]{subsection.2.4}{Recherche vectorielle}{section.2}% 6
-\BOOKMARK [2][-]{subsection.2.5}{Evaluation des performances}{section.2}% 7
-\BOOKMARK [1][-]{section.3}{Performances et analyse des r\351sultats}{}% 8
-\BOOKMARK [2][-]{subsection.3.1}{Pr\351sentation des performances}{section.3}% 9
