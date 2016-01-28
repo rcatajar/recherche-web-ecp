@@ -1,5 +1,6 @@
 # coding=utf-8
 from collections import defaultdict
+import time
 
 
 def get_queries():
@@ -44,5 +45,41 @@ def get_expected_results():
             # ie transforme '01' en '1' pour rester coherent avec le format dans l'index ou il n'y a pas ce 0
             query_id = str(int(query_id))
             doc_id = str(int(doc_id))
+            # Rajoute le doc au resultats attendues de la query
             results[query_id].append(doc_id)
     return results
+
+
+def precision(results, expected_results):
+    '''
+    Mesure de precision = P(pertinents|retrouvées)
+    '''
+    # Utilisations de set pour pouvoir facilement faire des intersections entre les 2 ensembles
+    results = set(results)
+    expected_results = set(expected_results)
+    pertinents = results & expected_results
+    return len(pertinents) / float(len(results))  # float force une division non entiere
+
+
+def rappel(results, expected_results):
+    '''
+    Mesure de rappel = P(retrouvées|pertinents)
+    '''
+    # Utilisations de set pour pouvoir facilement faire des intersections entre les 2 ensembles
+    results = set(results)
+    expected_results = set(expected_results)
+    pertinents = results & expected_results
+    return len(pertinents) / float(len(expected_results))  # float force une division non entiere
+
+
+def time_func(func, *args):
+    '''
+    Mesure le temps pris par le calcul de func avec les arguments données
+
+    Renvoie un couple time, resultats
+    '''
+    start = time.time()
+    results = func(*args)
+    end = time.time()
+
+    return (end - start, results)

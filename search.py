@@ -6,13 +6,13 @@
 # Et lui permet d'effectuer des recherches
 
 
-import time
 import sys
 
 from collection import CACMCollection
 from index import Index
 from vectorial_search import vectorial_search
 from boolean_search import boolean_search
+from evaluation_utils import time_func
 
 
 def choose_collection():
@@ -23,22 +23,27 @@ def choose_collection():
     print('1 - CACM')
     print('2 - Wikipedia (non implémenté pour le moment)')
     collection_choice = input('Choisissez une collection: ')
+
     if collection_choice == 1:
-        start = time.time()
-        collection = CACMCollection()
-        collection_imported = time.time()
+        # Import
+        import_time, collection = time_func(CACMCollection)
         print("\n")
-        print("Collection CACM importée en %s secondes" % (collection_imported - start))
-        index = Index(collection.documents)
-        collection_indexed = time.time()
-        print("Collection CACM indéxée en %s secondes" % (collection_indexed - collection_imported))
-        print("Taille de l'index en mémoire: ~ %s Méga-octets" % (sys.getsizeof(index) / float(10**6)))
+        print("Collection CACM importée en %s secondes" % (import_time))
+
+        # index
+        index_time, index = time_func(Index, collection.documents)
+        print("Collection CACM indéxée en %s secondes" % (index_time))
+        print("Taille de l'index en mémoire: ~ %s Méga-octets"
+              % (sys.getsizeof(index) / float(10**6)))
+
+        # print explications taille memoire
         print("\n")
-        print("En realite, ce script utilise plus de memoire car on garde egalement dans la RAM")
-        print("la collection entiere (~40 Mega-octets) pour pouvoir afficher le contenu des")
-        print("resultats de recherche a l'utilisateur (et non juste l'id des documents).")
-        print("Cependant, les fonctions de recherche utilisent exclusivement les indexes")
-        print("(cf methodes boolean_search et vectorial_search)")
+        print("En realite, ce script utilise plus de memoire car on garde")
+        print("egalement dans la RAM la collection entiere (~40 Mega-octets)")
+        print("pour pouvoir afficher le contenu les resultats de  sarecherche")
+        print("a l'utilisateur (et non juste l'id des documents).")
+        print("Cependant, les fonctions de recherche utilisent exclusivement")
+        print("les indexes (cf methodes boolean_search et vectorial_search)")
 
         return collection, index
     else:
@@ -131,19 +136,16 @@ if __name__ == '__main__':
 
     while True:  # la possibilite de quitter est dans le choix du type de recherche
         search_type = choose_search_type()
+
         if search_type == "vectorial":
             weight = choose_weight_type()
             query = choose_query()
-            start = time.time()
-            search_results = vectorial_search(query, index, weight)
-            end = time.time()
-            print("Temps d'exécution de la recherche: %s secondes" % (end - start))
+            search_time, search_results = time_func(vectorial_search, query, index, weight)
+            print("Temps d'exécution de la recherche: %s secondes" % (search_time))
             print_results_vectorial_search(search_results, query, collection)
 
         if search_type == "boolean":
             query = choose_query_bool()
-            start = time.time()
-            search_results = boolean_search(query, index)
-            end = time.time()
-            print("Temps d'exécution de la recherche: %s secondes" % (end - start))
+            search_time, search_results = time_func(boolean_search, query, index)
+            print("Temps d'exécution de la recherche: %s secondes" % (search_time))
             print_results_boolean_search(search_results, query, collection)
