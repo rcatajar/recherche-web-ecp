@@ -72,6 +72,31 @@ def rappel(results, expected_results):
     return len(pertinents) / float(len(expected_results))  # float force une division non entiere
 
 
+def E_measure(results, expected_results, B=1):
+    '''
+    Mesure E = 1 - (B^2 + 1)PR / (B^2 P + R)
+    avec:
+        - B = rapport precision / rappel voulu
+        - P = precision
+        - R = rappel
+
+    J'utlise B (beta dans le cours) = 1 par default
+    car le cours indique que c'est la valeur la plus populaire
+    '''
+    P = precision(results, expected_results)
+    R = rappel(results, expected_results)
+    return 1 - ((B**2 + 1) * P * R) / (B**2 * P + R)
+
+
+def F_measure(results, expected_results, B=1):
+    '''
+    Mesure F = 1 - E
+
+    A nouveau, utilisation de B = 1 par default car valeur la plus populaire
+    '''
+    return 1 - E_measure(results, expected_results, B)
+
+
 def time_func(func, *args):
     '''
     Mesure le temps pris par le calcul de func avec les arguments données
