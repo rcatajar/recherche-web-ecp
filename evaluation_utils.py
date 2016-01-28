@@ -98,6 +98,15 @@ def E_measure(results, expected_results, B=1):
     return 1 - ((B**2 + 1) * P * R) / (B**2 * P + R)
 
 
+def MAP(precisions):
+    '''
+    Mean Average Precision.
+
+    Ici precisions est une liste de valeurs de precisions
+    '''
+    return sum(precisions) / len(precisions)
+
+
 def F_measure(results, expected_results, B=1):
     '''
     Mesure F = 1 - E
