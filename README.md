@@ -2,7 +2,6 @@
 Projet pour le cours de Recherche d'Informations Web: implementation et benchmark de different modele de recherche sur la collection de document CACM
 
 ## Prerequis
-- git
 - Python 2.7 (le code fonctionne probablement avec python3, mais je ne l'ai pas tester)
 - la librarie nltk (installer via `sudo pip install nltk`). NLTK est utilisée pour ameliorer le preprocessing des documents et query (stopwords supplémentaires, tokenization plus precise et snowball stemming)
 - Les packages `stopwords`, `punkt` et `snowball_data` de nltk. Pour les installer (dans un shell python):
