@@ -26,7 +26,7 @@ class Index(object):
             -> retourne vecteur de poids ({mot1: poids1, mot2: poids2, ...}) pour le document id demandé.
                `weight_type` indique le type de poids a utiliser
                     ("tf_idf", "tf_idf_normalized", "tf_idf_log", "tf_idf_log_normalized")
-                `index` indique l'index a utiliser pour caculer la dft des mots
+                `index`, optionel indique l'index a utiliser pour caculer la dft des mots
                     (Utile pour indexer une query par rapport a une collection)
     '''
 

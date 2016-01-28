@@ -24,9 +24,10 @@ class CACMCollection(Collection):
     MARKER_TITLE = '.T'
     MARKER_SUMMARY = '.W'
     MARKER_KEYWORDS = '.K'
+    MARKER_AUTHOR = '.A'
 
-    # Les marqueurs à ignorer (cf sujet du projet)
-    IGNORED_MARKERS = ['.B', '.A', '.N', '.X', '.C']
+    # Les marqueurs à ignorer
+    IGNORED_MARKERS = ['.B', '.N', '.X', '.C']
 
     def __init__(self):
         raw_documents = self._separate_documents()
@@ -70,7 +71,8 @@ class CACMCollection(Collection):
         '''
         for _id, document in raw_documents.items():
             document = self._parse_document(document)
-            document = CACMDocument(_id, document['title'], document['summary'], document['keywords'])
+            document = CACMDocument(_id, document['title'], document['summary'],
+                                    document['keywords'], document['author'])
             self._documents[_id] = document
 
     def _parse_document(self, document):
@@ -80,7 +82,7 @@ class CACMCollection(Collection):
         ignore = False  # Pour savoir si le champ courant est a ignorer
         current_field = None  # le champ courant
         # le document qu'on va construire
-        processed_document = {'title': '', 'summary': '', 'keywords': ''}
+        processed_document = {'title': '', 'summary': '', 'keywords': '', 'author': ''}
 
         for line in document:
             # Si la ligne commence par un marqueur, on set ignore et current_field selon le type de marqueur
@@ -95,6 +97,9 @@ class CACMCollection(Collection):
             elif line.startswith(self.MARKER_KEYWORDS):
                 ignore = False
                 current_field = 'keywords'
+            elif line.startswith(self.MARKER_AUTHOR):
+                ignore = False
+                current_field = 'author'
 
             # Sinon, on remplit le champ approprié s'il ne faut pas l'ignorer
             elif ignore is False:

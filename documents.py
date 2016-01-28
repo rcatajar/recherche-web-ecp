@@ -19,11 +19,12 @@ class CACMDocument(Document):
     '''
     Represente un document de la collection CACM
     '''
-    def __init__(self, doc_id, title, summary, keywords):
+    def __init__(self, doc_id, title, summary, keywords, author):
         self.doc_id = doc_id
         self.title = title
         self.summary = summary
         self.keywords = keywords
+        self.author = author
 
     # Pour avoir un joli "print" du document
     def __str__(self):
@@ -35,7 +36,7 @@ class CACMDocument(Document):
 
     @property
     def text(self):
-        return ' '.join([self.title, self.summary, self.keywords])
+        return ' '.join([self.title, self.summary, self.keywords, self.author])
 
 
 class QueryDocument(Document):
