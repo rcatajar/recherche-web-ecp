@@ -72,6 +72,16 @@ def rappel(results, expected_results):
     return len(pertinents) / float(len(expected_results))  # float force une division non entiere
 
 
+def R_precision(results, expected_results):
+    '''
+    Precision au rang R, ou R est le nb de documents pertinents.
+
+    Pour que cette mesure est du sens, il faut que results soit ordonée par pertinence
+    (ie: ca ne sert a rien pour notre modele booleen non ordonée)
+    '''
+    return precision(results[:len(expected_results)], expected_results)
+
+
 def E_measure(results, expected_results, B=1):
     '''
     Mesure E = 1 - (B^2 + 1)PR / (B^2 P + R)
