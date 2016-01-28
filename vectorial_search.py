@@ -34,8 +34,10 @@ def vectorial_search(querystring, collection_index, weight_type):
     # On trie nos resultats par ordre decroissant de similarité
     search_results = sorted(search_results, key=lambda result: -result.similarity)
 
-    # On revoie les résultats qui ont une similarité > 0
-    return [result for result in search_results if result.similarity > 0]
+    # On revoie les résultats qui ont une similarité d'au moins 15%
+    # J'ai tester differents minimus de similarité et 15% semble etre celui donnant
+    # filtrant le mieux les resultats (pour les query de reference du dataset)
+    return [result for result in search_results if result.similarity > 0.15]
 
 
 def cosinus_similarity(query_vector, doc_vector):

@@ -5,6 +5,10 @@ from collections import defaultdict
 import string
 from math import log10
 
+from nltk import word_tokenize
+from nltk.stem.snowball import SnowballStemmer
+from nltk.corpus import stopwords
+
 
 class Index(object):
     '''
@@ -119,28 +123,26 @@ class Index(object):
             - mise en minuscule du texte
             - tokenisation
             - retrait des stop_words
-            - stemming des mots (TODO)
+            - stemming des mots
         '''
         # On met le texte en minuscule
         text = text.lower()
 
         # Tokenisation
-        # TODO: tokenisation plus précise via NLTK http://www.nltk.org/howto/tokenize.html
-        # On remplace la ponctuation et les sauts de lignes par des espaces
-        # puis on recupere la liste des mots
-        text = text.replace('\n', ' ')
-        for punct in string.punctuation:
-            text = text.replace(punct, ' ')
-        words = [word for word in text.split(' ') if word]
+        tokens = word_tokenize(text, language="english")
 
         # stop_words
-        # On retire les stop words de notre liste de mots
-        words = [word for word in words if word not in self.stop_words]
+        # On retire les stop words de notre vecteur.
+        # En plus des stopwords donnees avec la collection, je rajoute les mots courants
+        # Anglais donnés par NLTK et la ponctuation (sauf parantheses car utile pour query bool)
+        stop_words = self.stop_words + list(string.punctuation) + stopwords.words("english")
+        tokens = [token for token in tokens if token not in stop_words]
 
-        # Stemming (optionel)
-        # TODO Porter ou Snowball stemming via NLTK (http://www.nltk.org/howto/stem.html)
+        # Stemming
+        stemmer = SnowballStemmer(language="english")
+        tokens = [stemmer.stem(word) for word in tokens]
 
-        return words
+        return tokens
 
     def _dft(self, word):
         '''

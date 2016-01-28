@@ -1,6 +1,5 @@
 # coding=utf-8
-import string
-import re
+from nltk import word_tokenize
 
 """
 L'idée ici est de représenter la query par un arbre
@@ -94,20 +93,26 @@ class WordNode(Node):
         return set(self.index.search_word(self.word))
 
 
-def _tokenize_query(query):
+def _tokenize_query(query, index):
     '''
     Tokenisation de la query
     '''
     # On met tout en minuscule
     query = query.lower()
 
-    # On split a chaque non alpha-numérique charactère
-    tokens = re.split(r'\W', query)
+    # On tokenize
+    words = word_tokenize(query, 'english')
 
-    # On retire la ponctuation (sauf les paranthèses) et les éventuels espaces
-    stop_characters = string.punctuation.replace('(', '').replace(')', '')
-    stop_characters += string.whitespace
-    tokens = [token for token in tokens if token not in stop_characters]
+    # On utlise le preprocessing de l'index pour etre coherent avec le traitement des docs
+    # SAUF si le mot est dans ["(", ")", "and", "or", "not"] car ce sont des "mots d'actions"
+    # pour la recherche booleene qui seraient sinon retirés par le preprocessing
+    tokens = []
+    for word in words:
+        if _is_word(word):
+            # Preprocessing
+            tokens += index._text_to_words(word)
+        else:
+            tokens.append(word)
     return tokens
 
 
@@ -148,7 +153,7 @@ def build_query_tree(query, index):
     Construit l'arbre a partir de la query et l'index donnés
     '''
     # On tokenise
-    tokens = _tokenize_query(query)
+    tokens = _tokenize_query(query, index)
 
     # On rajoute des AND si necessaire
     tokens = _add_missing_and(tokens)
