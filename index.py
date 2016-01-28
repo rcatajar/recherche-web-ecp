@@ -126,10 +126,15 @@ class Index(object):
             - stemming des mots
         '''
         # On met le texte en minuscule
-        text = text.lower()
+        text = text.lower().strip()
 
         # Tokenisation
         tokens = word_tokenize(text, language="english")
+
+        # On retire les mots commencant par une apostrophe
+        # (la tokenization transforme I'd like en ["I", "'d", "like"]
+        #  et on pourrait se passer de "'d")
+        tokens = [token for token in tokens if not token.startswith("'")]
 
         # stop_words
         # On retire les stop words de notre vecteur.

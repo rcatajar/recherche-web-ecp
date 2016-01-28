@@ -108,7 +108,7 @@ def choose_query_bool():
     print('Format de la query:')
     print('    - Opérateurs acceptés: "(", ")", "AND", "OR", "NOT"')
     print('    - Un espace est considéré comme un AND')
-    print('     - Le nombre de paranthèses ouvertes doit matcher le nombre de paranthèses fermées')
+    print('    - Le nombre de paranthèses ouvertes doit matcher le nombre de paranthèses fermées')
     query = raw_input("Entrez votre query: ")
     print('\n')
     return query

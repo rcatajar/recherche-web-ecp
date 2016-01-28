@@ -23,7 +23,7 @@ from collection import CACMCollection
 from index import Index
 from vectorial_search import vectorial_search
 from boolean_search import boolean_search
-from evaluation_utils import time_func
+from evaluation_utils import time_func, precision, rappel, R_precision, E_measure, F_measure, moyenne, get_queries, get_expected_results
 
 ##############
 # INDEXATION #
@@ -39,10 +39,11 @@ index_size = sys.getsizeof(index) / float(10**6)
 ##############
 # RECHERCHES #
 ##############
+
 def evaluate_search(query, expected_results):
     '''
-    Evalue la recherche donnée pour les differents modeles
-    Calcule temps de recherche, precision, rappel, F et E measure
+    Evalue la performance de la recherche donnée pour les differents modeles
+    Calcule temps de recherche, precision, R precision, rappel, F et E measure
     '''
 
     # Ce qu'on va renvoyer
@@ -52,9 +53,32 @@ def evaluate_search(query, expected_results):
     # modele booleen
     bool_time, search_results = time_func(boolean_search, query, index)
     evaluation['bool']['time'] = bool_time
+    evaluation['bool']['precision'] = precision(search_results, expected_results)
+    evaluation['bool']['rappel'] = rappel(search_results, expected_results)
+    # pas de R precision car resultats non ordonées
+    evaluation['bool']['F_measure'] = F_measure(search_results, expected_results)
+    evaluation['bool']['E_measure'] = E_measure(search_results, expected_results)
 
-# Pour chaque modele et ponderation
-# Parser les requetes donnes et leurs resultats
-# pour chaqune de ces requetes calculer toutes les mesures
+    # modele vectoriel (evalué avec poids tf idf log normalisee
+    # (d'apres mes tests, c'est la ponderation qui donne les meilleurs resultats)
+    vect_time, search_results = time_func(vectorial_search, query, index, "tf_idf_log_normalized")
+    search_results = [result.doc_id for result in search_results]
+    evaluation['vect']['time'] = bool_time
+    evaluation['vect']['precision'] = precision(search_results, expected_results)
+    evaluation['vect']['rappel'] = rappel(search_results, expected_results)
+    evaluation['vect']['R_precision'] = R_precision(search_results, expected_results)
+    evaluation['vect']['F_measure'] = F_measure(search_results, expected_results)
+    evaluation['vect']['E_measure'] = E_measure(search_results, expected_results)
 
-# Calculer MAP de toutes ces requetes
+    return evaluation
+
+# EVALUATION DE TOUTES LES QUERYS
+
+queries = get_queries()
+results = get_expected_results()
+evaluations = {}
+
+# On evalue les perfs de la query donnée
+for idx, query in queries.iteritems():
+    expected_results = results[idx]
+    evaluations[idx] = evaluate_search(query, expected_results)

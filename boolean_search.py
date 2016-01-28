@@ -98,7 +98,7 @@ def _tokenize_query(query, index):
     Tokenisation de la query
     '''
     # On met tout en minuscule
-    query = query.lower()
+    query = query.lower().strip()
 
     # On tokenize
     words = word_tokenize(query, 'english')
@@ -108,10 +108,10 @@ def _tokenize_query(query, index):
     # pour la recherche booleene qui seraient sinon retirés par le preprocessing
     tokens = []
     for word in words:
-        if _is_word(word):
+        if word and _is_word(word):
             # Preprocessing
             tokens += index._text_to_words(word)
-        else:
+        else:  # le mot est un "mot d'action"
             tokens.append(word)
     return tokens
 
