@@ -58,10 +58,18 @@ def get_expected_results():
     return results
 
 
-def precision(results, expected_results):
+def precision(results, expected_results, ordre=None):
     '''
     Mesure de precision = P(pertinents|retrouvées)
+
+    Si un ordre est donnée, calcul la precision a cette ordre
     '''
+    if ordre:
+        # Si on calcule la precision a l'ordre k
+        # on ne garde que les k premiers resultats
+        results = results[:ordre]
+        expected_results = expected_results[:ordre]
+
     # Utilisations de set pour pouvoir facilement faire des intersections entre les 2 ensembles
     results = set(results)
     expected_results = set(expected_results)
@@ -74,17 +82,23 @@ def precision(results, expected_results):
     return len(pertinents) / float(len(results))  # float force une division non entiere
 
 
-def rappel(results, expected_results):
+def rappel(results, expected_results, ordre=None):
     '''
     Mesure de rappel = P(retrouvées|pertinents)
     '''
+    if ordre:
+        # Si on calcule le rappel a l'ordre k
+        # on ne garde que les k premiers resultats
+        results = results[:ordre]
+        expected_results = expected_results[:ordre]
+
     # Utilisations de set pour pouvoir facilement faire des intersections entre les 2 ensembles
     results = set(results)
     expected_results = set(expected_results)
     pertinents = results & expected_results
     if not expected_results:
-        # Si on attend 0 resultats, le rappel vaut 0
-        return 0
+        # Si on attend 0 resultats, le rappel vaut 1
+        return 1
     return len(pertinents) / float(len(expected_results))  # float force une division non entiere
 
 
@@ -125,10 +139,22 @@ def F_measure(results, expected_results, B=1):
     return 1 - E_measure(results, expected_results, B)
 
 
-def moyenne(data):
+def average_precision(results, expected_results):
+    '''
+    La precision moyenne pour une recherche est
+    la moyenne des pertinences aux differents ordres
+    '''
+    if expected_results:
+        return average([precision(results, expected_results, i + 1)
+                        for i in range(len(expected_results))])
+    else:  # pas de resultat attendu, la precision moyenne est 1
+        return 1
+
+
+def average(data):
     '''
     Retourne moyenne arithmetique de la serie data
-    (permet de calculer le MAP)
+    (permet de calculer le MAP et la precision moyenne)
     '''
     return float(sum(data)) / len(data)
 

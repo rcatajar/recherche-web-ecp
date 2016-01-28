@@ -23,8 +23,8 @@ from collection import CACMCollection
 from index import Index
 from vectorial_search import vectorial_search
 from boolean_search import boolean_search
-from evaluation_utils import time_func, get_queries, get_expected_results
-from evaluation_utils import E_measure, F_measure, moyenne, precision, rappel, R_precision
+from evaluation_utils import time_func, get_queries, get_expected_results, average_precision
+from evaluation_utils import E_measure, F_measure, average, precision, rappel, R_precision
 
 ##############
 # INDEXATION #
@@ -69,6 +69,7 @@ def evaluate_search(query, expected_results):
     evaluation['vect']['R_precision'] = R_precision(search_results, expected_results)
     evaluation['vect']['F_measure'] = F_measure(search_results, expected_results)
     evaluation['vect']['E_measure'] = E_measure(search_results, expected_results)
+    evaluation['vect']['average_precision'] = average_precision(search_results, expected_results)
 
     return evaluation
 
@@ -99,35 +100,38 @@ print("\n")
 print("MODELE BOOLEEN:")
 # Calcul des moyennes
 boolean_results = [evaluation['bool'] for evaluation in evaluations.values()]
-average_time = moyenne([result['time'] for result in boolean_results])
-average_precision = moyenne([result['precision'] for result in boolean_results])
-average_rappel = moyenne([result['rappel'] for result in boolean_results])
-average_F_measure = moyenne([result['F_measure'] for result in boolean_results])
-average_E_measure = moyenne([result['E_measure'] for result in boolean_results])
+average_time = average([result['time'] for result in boolean_results])
+average_precision_ = average([result['precision'] for result in boolean_results])
+average_rappel = average([result['rappel'] for result in boolean_results])
+average_F_measure = average([result['F_measure'] for result in boolean_results])
+average_E_measure = average([result['E_measure'] for result in boolean_results])
 
 # Affichage resultats
-print("Temps de recherche moyen: %s s" % average_time)
-print("Precision moyenne:        %s" % average_precision)
-print("Rappel moyen:             %s" % average_rappel)
-print("F mesure moyenne:         %s" % average_F_measure)
-print("E mesure moyenne:         %s" % average_E_measure)
+print("Temps de recherche moyen:       %s s" % average_time)
+print("Precision (sans ordre) moyenne: %s" % average_precision)
+print("Rappel moyen:                   %s" % average_rappel)
+print("F mesure moyenne:               %s" % average_F_measure)
+print("E mesure moyenne:               %s" % average_E_measure)
 
 # Modele vectoriel
 print("\n")
 print("MODELE VECTORIEL:")
 # Calcul des moyennes
-boolean_results = [evaluation['vect'] for evaluation in evaluations.values()]
-average_time = moyenne([result['time'] for result in boolean_results])
-average_precision = moyenne([result['precision'] for result in boolean_results])
-average_rappel = moyenne([result['rappel'] for result in boolean_results])
-average_R_precision = moyenne([result['R_precision'] for result in boolean_results])
-average_F_measure = moyenne([result['F_measure'] for result in boolean_results])
-average_E_measure = moyenne([result['E_measure'] for result in boolean_results])
+vectorial_results = [evaluation['vect'] for evaluation in evaluations.values()]
+average_time = average([result['time'] for result in vectorial_results])
+average_precision_ = average([result['precision'] for result in vectorial_results])
+average_rappel = average([result['rappel'] for result in vectorial_results])
+average_R_precision = average([result['R_precision'] for result in vectorial_results])
+average_F_measure = average([result['F_measure'] for result in vectorial_results])
+average_E_measure = average([result['E_measure'] for result in vectorial_results])
+# Le MAP est la moyenne des averages precision
+map_ = average([result['average_precision'] for result in vectorial_results])
 
 # Affichage resultats
-print("Temps de recherche moyen: %s s" % average_time)
-print("Precision moyenne:        %s" % average_precision)
-print("Rappel moyen:             %s" % average_rappel)
-print("R precision moyenne:      %s" % average_R_precision)
-print("F mesure moyenne:         %s" % average_F_measure)
-print("E mesure moyenne:         %s" % average_E_measure)
+print("Temps de recherche moyen:       %s s" % average_time)
+print("Precision (sans ordre) moyenne: %s" % average_precision)
+print("Rappel moyen:                   %s" % average_rappel)
+print("R precision moyenne:            %s" % average_R_precision)
+print("F mesure moyenne:               %s" % average_F_measure)
+print("E mesure moyenne:               %s" % average_E_measure)
+print("MAP (Mean average precision):   %s" % map_)
