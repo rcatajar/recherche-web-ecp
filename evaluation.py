@@ -108,7 +108,7 @@ average_E_measure = average([result['E_measure'] for result in boolean_results])
 
 # Affichage resultats
 print("Temps de recherche moyen:       %s s" % average_time)
-print("Precision (sans ordre) moyenne: %s" % average_precision)
+print("Precision (sans ordre) moyenne: %s" % average_precision_)
 print("Rappel moyen:                   %s" % average_rappel)
 print("F mesure moyenne:               %s" % average_F_measure)
 print("E mesure moyenne:               %s" % average_E_measure)
@@ -129,7 +129,7 @@ map_ = average([result['average_precision'] for result in vectorial_results])
 
 # Affichage resultats
 print("Temps de recherche moyen:       %s s" % average_time)
-print("Precision (sans ordre) moyenne: %s" % average_precision)
+print("Precision (sans ordre) moyenne: %s" % average_precision_)
 print("Rappel moyen:                   %s" % average_rappel)
 print("R precision moyenne:            %s" % average_R_precision)
 print("F mesure moyenne:               %s" % average_F_measure)
