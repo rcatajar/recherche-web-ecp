@@ -3,7 +3,7 @@ import inspect
 import sys
 from collections import defaultdict
 import string
-from math import log10
+from math import log10, sqrt
 
 from nltk import word_tokenize
 from nltk.stem.snowball import SnowballStemmer
@@ -171,10 +171,10 @@ class Index(object):
 
         # Normalisation si demandé
         if normalize:
-            # On normalize en divisant par le plus grand poids dans le doc
-            normalize_factor = max(tf_idf.values())
+            # On normalize en divisant par la norme du vecteur
+            norm = sqrt(sum(x**2 for x in tf_idf.values()))
             for word, weight in tf_idf.items():
-                tf_idf[word] = weight / normalize_factor
+                tf_idf[word] = weight / norm
 
         return tf_idf
 
@@ -194,10 +194,10 @@ class Index(object):
 
         # Normalisation si demandé
         if normalize:
-            # On normalize en divisant par le plus grand poids dans le doc
-            normalize_factor = max(tf_idf_log.values())
+            # On normalize en divisant par la norme du vecteur
+            norm = sqrt(sum(x**2 for x in tf_idf_log.values()))
             for word, weight in tf_idf_log.items():
-                tf_idf_log[word] = weight / normalize_factor
+                tf_idf_log[word] = weight / norm
 
         return tf_idf_log
 
