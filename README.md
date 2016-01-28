@@ -1,6 +1,6 @@
 # recherche-web-ecp
 Projet pour le cours de Recherche d'Informations Web: implementation et benchmark de different modele de recherche sur la collection de document CACM.
-Le rapport présentant les choix d'implementation et les resultats du moteur est disponible <https://github.com/rcatajar/recherche-web-ecp/blob/master/rapport.pdf>
+Le rapport présentant les choix d'implementation et les resultats du moteur est disponible <https://github.com/rcatajar/recherche-web-ecp/raw/master/rapport.pdf>
 
 ## Prerequis
 - Python 2.7 (le code fonctionne probablement avec python3, mais je ne l'ai pas tester)
