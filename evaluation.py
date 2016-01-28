@@ -23,7 +23,8 @@ from collection import CACMCollection
 from index import Index
 from vectorial_search import vectorial_search
 from boolean_search import boolean_search
-from evaluation_utils import time_func, precision, rappel, R_precision, E_measure, F_measure, moyenne, get_queries, get_expected_results
+from evaluation_utils import time_func, get_queries, get_expected_results
+from evaluation_utils import E_measure, F_measure, moyenne, precision, rappel, R_precision
 
 ##############
 # INDEXATION #
@@ -36,10 +37,9 @@ indexation_time, index = time_func(Index, collection.documents)
 index_size = sys.getsizeof(index) / float(10**6)
 
 
-##############
-# RECHERCHES #
-##############
-
+##################################
+# METHODE POUR EVALUER UNE QUERY #
+###################################
 def evaluate_search(query, expected_results):
     '''
     Evalue la performance de la recherche donnée pour les differents modeles
@@ -72,8 +72,10 @@ def evaluate_search(query, expected_results):
 
     return evaluation
 
-# EVALUATION DE TOUTES LES QUERYS
 
+####################################
+# EVALUATION DE TOUTES LES QUERIES #
+####################################
 queries = get_queries()
 results = get_expected_results()
 evaluations = {}
@@ -82,3 +84,50 @@ evaluations = {}
 for idx, query in queries.iteritems():
     expected_results = results[idx]
     evaluations[idx] = evaluate_search(query, expected_results)
+
+
+##################################
+# AFFICHAGE DES RESULTATS MOYENS #
+##################################
+# Parsing et indexation
+print("Temps pour importer et parser la collection: %s s" % import_time)
+print("Temps pour indexer la collection:            %s s" % indexation_time)
+print("Taille de l'index:                           %s Mo" % index_size)
+
+# Modele booleen
+print("\n")
+print("MODELE BOOLEEN:")
+# Calcul des moyennes
+boolean_results = [evaluation['bool'] for evaluation in evaluations.values()]
+average_time = moyenne([result['time'] for result in boolean_results])
+average_precision = moyenne([result['precision'] for result in boolean_results])
+average_rappel = moyenne([result['rappel'] for result in boolean_results])
+average_F_measure = moyenne([result['F_measure'] for result in boolean_results])
+average_E_measure = moyenne([result['E_measure'] for result in boolean_results])
+
+# Affichage resultats
+print("Temps de recherche moyen: %s s" % average_time)
+print("Precision moyenne:        %s" % average_precision)
+print("Rappel moyen:             %s" % average_rappel)
+print("F mesure moyenne:         %s" % average_F_measure)
+print("E mesure moyenne:         %s" % average_E_measure)
+
+# Modele vectoriel
+print("\n")
+print("MODELE VECTORIEL:")
+# Calcul des moyennes
+boolean_results = [evaluation['vect'] for evaluation in evaluations.values()]
+average_time = moyenne([result['time'] for result in boolean_results])
+average_precision = moyenne([result['precision'] for result in boolean_results])
+average_rappel = moyenne([result['rappel'] for result in boolean_results])
+average_R_precision = moyenne([result['R_precision'] for result in boolean_results])
+average_F_measure = moyenne([result['F_measure'] for result in boolean_results])
+average_E_measure = moyenne([result['E_measure'] for result in boolean_results])
+
+# Affichage resultats
+print("Temps de recherche moyen: %s s" % average_time)
+print("Precision moyenne:        %s" % average_precision)
+print("Rappel moyen:             %s" % average_rappel)
+print("R precision moyenne:      %s" % average_R_precision)
+print("F mesure moyenne:         %s" % average_F_measure)
+print("E mesure moyenne:         %s" % average_E_measure)
